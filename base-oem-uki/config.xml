@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  Base OEM Image with systemd-boot + UKI — Raw Disk Image
+
+  A minimal Fedora-based system image with:
+  - Two partitions only: EFI (FAT32) + root (ext4)
+  - systemd-boot bootloader
+  - Unified Kernel Image (UKI) for secure boot compatibility
+  - Basic Fedora system, ready for customization
+
+  Build:
+    kiwi-ng --type oem system build \
+        --description ./base-oem-uki \
+        --target-dir ./outdir
+
+  The resulting raw disk image can be written directly to a drive:
+    dd if=Fedora-Base-OEM-UKI.raw of=/dev/sdX bs=4M status=progress
+-->
+
+<image schemaversion="7.4" name="Fedora-Base-OEM-UKI">
+	<description type="system">
+		<author>ALACS</author>
+		<contact>alacs@localhost</contact>
+		<specification>Base Fedora OEM image with systemd-boot and UKI</specification>
+	</description>
+
+	<preferences>
+		<version>1.0.0</version>
+		<packagemanager>dnf5</packagemanager>
+		<locale>en_US</locale>
+		<keytable>us</keytable>
+		<timezone>UTC</timezone>
+		<rpm-excludedocs>true</rpm-excludedocs>
+	</preferences>
+
+	<!-- ============================================================ -->
+	<!--  OEM type: raw disk image with systemd-boot + UKI            -->
+	<!--  Two partitions: EFI (FAT32) + root (ext4)                   -->
+	<!-- ============================================================ -->
+	<preferences arch="x86_64">
+		<type image="oem"
+		      primary="true"
+		      filesystem="ext4"
+		      firmware="uefi"
+		      bootpartition="false"
+		      efipartsize="512"
+		      efipartition="true"
+		      devicepersistency="by-uuid"
+		      rootfs_label="fedora"
+		      kernelcmdline="rhgb quiet systemd.firstboot=off"
+		      initrd_system="none"
+		      editbootconfig="editbootconfig.sh"
+		      >
+			<bootloader name="systemd_boot" timeout="3"/>
+			<oemconfig>
+				<oem-resize>true</oem-resize>
+			</oemconfig>
+			<size unit="G">20</size>
+		</type>
+	</preferences>
+
+	<!-- ============================================================ -->
+	<!--  Repositories — Fedora stable                                 -->
+	<!-- ============================================================ -->
+	<repository type="rpm-md" alias="fedora" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+		</source>
+	</repository>
+	<repository type="rpm-md" alias="updates" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+		</source>
+	</repository>
+
+	<!-- ============================================================ -->
+	<!--  Bootstrap                                                    -->
+	<!-- ============================================================ -->
+	<packages type="bootstrap">
+		<package name="filesystem"/>
+	</packages>
+
+	<!-- ============================================================ -->
+	<!--  Image packages                                               -->
+	<!-- ============================================================ -->
+	<packages type="image">
+		<!-- Fedora release -->
+		<package name="fedora-release-workstation"/>
+
+		<!-- UKI kernel (Unified Kernel Image) -->
+		<package name="kernel-uki-virt"/>
+		<package name="uki-direct"/>
+		<package name="python3-virt-firmware"/>
+
+		<!-- Core system -->
+		<package name="systemd"/>
+		<package name="systemd-udev"/>
+		<package name="systemd-resolved"/>
+		<package name="systemd-oomd-defaults"/>
+		<package name="bash"/>
+		<package name="coreutils"/>
+		<package name="util-linux"/>
+		<package name="glibc"/>
+
+		<!-- Networking -->
+		<package name="NetworkManager"/>
+		<package name="iproute"/>
+		<package name="iputils"/>
+
+		<!-- GNOME Desktop Environment -->
+		<namedCollection name="workstation-product-environment"/>
+		<namedCollection name="fonts"/>
+		<namedCollection name="multimedia"/>
+		<namedCollection name="networkmanager-submodules"/>
+		<namedCollection name="printing"/>
+		<namedCollection name="guest-desktop-agents"/>
+		<package name="mediawriter"/>
+
+		<!-- Basic utilities -->
+		<package name="less"/>
+		<package name="procps-ng"/>
+		<package name="findutils"/>
+		<package name="grep"/>
+		<package name="sed"/>
+		<package name="gawk"/>
+		<package name="vim-minimal"/>
+		<package name="sudo"/>
+
+		<!-- Firmware -->
+		<package name="linux-firmware"/>
+
+		<!-- Filesystem tools -->
+		<package name="e2fsprogs"/>
+		<package name="dosfstools"/>
+
+		<!-- Locale support -->
+		<package name="glibc-all-langpacks"/>
+	</packages>
+
+	<!-- ============================================================ -->
+	<!--  Users                                                        -->
+	<!-- ============================================================ -->
+	<users>
+		<user name="root" groups="root" password="linux" home="/root" pwdformat="plain"/>
+	</users>
+</image>

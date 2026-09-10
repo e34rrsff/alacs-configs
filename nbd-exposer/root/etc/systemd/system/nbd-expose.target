@@ -1,0 +1,12 @@
+[Unit]
+Description=ALACS NBD Exposer Target
+Documentation=man:nbd-server(8)
+After=network-online.target
+Wants=network-online.target nbd-expose.service
+
+# We replace the normal multi-user target — no login prompt, no DE.
+Conflicts=multi-user.target graphical.target
+AllowIsolate=yes
+
+[Install]
+Alias=default.target

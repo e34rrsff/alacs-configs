@@ -1,0 +1,26 @@
+[Unit]
+Description=ALACS NBD Block Device Exposer
+Documentation=man:nbd-server(8)
+After=network-online.target systemd-udev-settle.service
+Wants=network-online.target
+ConditionPathExists=/usr/local/bin/nbd-expose.sh
+
+# Pull this in from the custom target (see nbd-expose.target)
+PartOf=nbd-expose.target
+
+[Service]
+Type=idle
+ExecStart=/usr/local/bin/nbd-expose.sh
+StandardInput=tty
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+# Let the operator Ctrl-C out cleanly
+KillSignal=SIGINT
+
+[Install]
+WantedBy=nbd-expose.target
