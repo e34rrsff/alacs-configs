@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  Base OEM Image with systemd-boot + UKI — Raw Disk Image
+  Base OEM Image with systemd-boot — Raw Disk Image
 
-  A minimal Fedora-based system image with:
-  - Two partitions only: EFI (FAT32) + root (ext4)
+  A Fedora Workstation-based system image with:
   - systemd-boot bootloader
-  - Unified Kernel Image (UKI) for secure boot compatibility
-  - Basic Fedora system, ready for customization
+  - GNOME desktop environment
+  - Two partitions: EFI (FAT32) + root (ext4)
 
   Build:
     kiwi-ng --type oem system build \
@@ -22,7 +21,7 @@
 	<description type="system">
 		<author>ALACS</author>
 		<contact>alacs@localhost</contact>
-		<specification>Base Fedora OEM image with systemd-boot and UKI</specification>
+		<specification>Base Fedora OEM image with systemd-boot</specification>
 	</description>
 
 	<preferences>
@@ -30,28 +29,23 @@
 		<packagemanager>dnf5</packagemanager>
 		<locale>en_US</locale>
 		<keytable>us</keytable>
-		<timezone>America/Los_Angeles</timezone>
+		<timezone>UTC</timezone>
 		<rpm-excludedocs>true</rpm-excludedocs>
 		<release-version>44</release-version>
 	</preferences>
 
 	<!-- ============================================================ -->
-	<!--  OEM type: raw disk image with systemd-boot + UKI            -->
-	<!--  Two partitions: EFI (FAT32) + root (ext4)                   -->
+	<!--  OEM type: raw disk image with systemd-boot                  -->
+	<!--  Based on Kiwi's official systemd_boot integration test      -->
 	<!-- ============================================================ -->
 	<preferences arch="x86_64">
 		<type image="oem"
 		      primary="true"
 		      filesystem="ext4"
-		      firmware="uefi"
-		      bootpartition="false"
+		      firmware="efi"
 		      efipartsize="512"
-		      efipartition="true"
-		      devicepersistency="by-uuid"
-		      rootfs_label="fedora"
-		      kernelcmdline="rhgb quiet systemd.firstboot=off"
-		      initrd_system="none"
-		      editbootconfig="editbootconfig.sh"
+		      kernelcmdline="rhgb quiet"
+		      format="raw"
 		      >
 			<bootloader name="systemd_boot" timeout="3"/>
 			<oemconfig>
@@ -66,12 +60,12 @@
 	<!-- ============================================================ -->
 	<repository type="rpm-md" alias="fedora" sourcetype="metalink">
 		<source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&amp;arch=$basearch">
-			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-44-primary"/>
 		</source>
 	</repository>
 	<repository type="rpm-md" alias="updates" sourcetype="metalink">
 		<source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&amp;arch=$basearch">
-			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-44-primary"/>
 		</source>
 	</repository>
 
@@ -89,10 +83,12 @@
 		<!-- Fedora release -->
 		<package name="fedora-release-workstation"/>
 
-		<!-- UKI kernel (Unified Kernel Image) -->
-		<package name="kernel-uki-virt"/>
-		<package name="uki-direct"/>
-		<package name="python3-virt-firmware"/>
+		<!-- Standard kernel -->
+		<package name="kernel-core"/>
+		<package name="kernel-modules"/>
+
+		<!-- systemd-boot -->
+		<package name="systemd-boot-unsigned"/>
 
 		<!-- Core system -->
 		<package name="systemd"/>
