@@ -26,8 +26,9 @@
 		<packagemanager>dnf5</packagemanager>
 		<locale>en_US</locale>
 		<keytable>us</keytable>
-		<timezone>UTC</timezone>
+		<timezone>Los_Angeles</timezone>
 		<rpm-excludedocs>true</rpm-excludedocs>
+		<release-version>44</release-version>
 	</preferences>
 
 	<!-- ============================================================ -->
