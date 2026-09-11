@@ -1,7 +1,7 @@
 #!/bin/bash
-# build.sh — Build the NBD Exposer ISO and/or the Base OEM UKI image
+# build.sh — Build the NBD Exposer ISO and/or the Workstation image
 #
-# Usage: ./build.sh [nbd|oem|all]
+# Usage: ./build.sh [nbd|workstation|all]
 
 set -euo pipefail
 
@@ -10,17 +10,17 @@ OUTPUT_BASE="${SCRIPT_DIR}/build-output"
 
 usage() {
     cat << EOF
-Usage: $0 [nbd|oem|all]
+Usage: $0 [nbd|workstation|all]
 
 Build targets:
-  nbd   - Build the NBD Exposer live ISO
-  oem   - Build the Base OEM UKI image (Fedora Workstation with GNOME)
-  all   - Build both images
+  nbd          - Build the NBD Exposer live ISO
+  workstation  - Build the Workstation raw disk image (Fedora + GNOME)
+  all          - Build both images
 
 Examples:
-  $0 nbd    # Builds nbd-exposer/ -> build-output/nbd-exposer/
-  $0 oem    # Builds base-oem-uki/ -> build-output/base-oem-uki/
-  $0 all    # Builds both images to their respective output dirs
+  $0 nbd            # Builds nbd-exposer/ -> build-output/nbd-exposer/
+  $0 workstation    # Builds workstation/ -> build-output/workstation/
+  $0 all            # Builds both images to their respective output dirs
 EOF
     exit 1
 }
@@ -36,11 +36,11 @@ build_image() {
             kiwi_type="iso"
             echo "==> Building NBD Exposer ISO..."
             ;;
-        oem)
-            desc_dir="${SCRIPT_DIR}/base-oem-uki"
-            out_dir="${OUTPUT_BASE}/base-oem-uki"
+        workstation)
+            desc_dir="${SCRIPT_DIR}/workstation"
+            out_dir="${OUTPUT_BASE}/workstation"
             kiwi_type="oem"
-            echo "==> Building Base OEM UKI image..."
+            echo "==> Building Workstation raw disk image..."
             ;;
         *)
             echo "Error: Unknown target '$target'"
@@ -71,10 +71,10 @@ fi
 case "$1" in
     all)
         build_image "nbd"
-        build_image "oem"
+        build_image "workstation"
         echo "==> All builds complete!"
         ;;
-    nbd|oem)
+    nbd|workstation)
         build_image "$1"
         ;;
     *)

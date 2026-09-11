@@ -1,11 +1,11 @@
 #!/bin/bash
-# config.sh — post-build configuration for the base OEM image
+# config.sh — post-build configuration for the ALACS Workstation image
 
 set -euxo pipefail
 test -f /.kconfig && . /.kconfig
 test -f /.profile && . /.profile
 
-echo "==> Configuring Base OEM image..."
+echo "==> Configuring ALACS Workstation image..."
 
 # ── Machine-id: reset so every boot gets a unique one ──────────────
 rm -f /etc/machine-id
@@ -20,19 +20,23 @@ systemctl enable NetworkManager.service
 systemctl enable firewalld.service
 systemctl enable gdm.service
 
-# ── Configure systemd-firstboot to skip interactive setup ─────────
-mkdir -p /etc/systemd/system/systemd-firstboot.service.d
-cat > /etc/systemd/system/systemd-firstboot.service.d/skip.conf << 'EOF'
-[Service]
-ExecStart=
-ExecStart=/bin/true
-EOF
+# ── Configure grub ────────────────────────────────────────────────
+echo "GRUB_DEFAULT=saved" >> /etc/default/grub
+echo "GRUB_DISABLE_SUBMENU=true" >> /etc/default/grub
+echo "GRUB_DISABLE_RECOVERY=true" >> /etc/default/grub
 
 # ── Set up fstab ──────────────────────────────────────────────────
 if [ -f /etc/fstab ]; then
     # Add umask=0077,shortname=winnt to ESP mount options
     sed -i '/\/boot\/efi/s/defaults/defaults,umask=0077,shortname=winnt/' /etc/fstab
 fi
+
+# ── Root partition resize on first boot ───────────────────────────
+mkdir -p /etc/repart.d/
+cat > /etc/repart.d/50-root.conf << EOF
+[Partition]
+Type=root
+EOF
 
 # ── Finalization ──────────────────────────────────────────────────
 touch -r "/usr" "/etc/.updated" "/var/.updated"

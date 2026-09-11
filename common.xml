@@ -1,0 +1,53 @@
+<image>
+	<!-- Shared preferences for all ALACS images -->
+	<preferences>
+		<version>1.0.0</version>
+		<packagemanager>dnf5</packagemanager>
+		<locale>en_US</locale>
+		<keytable>us</keytable>
+		<timezone>America/Los_Angeles</timezone>
+		<rpm-excludedocs>true</rpm-excludedocs>
+		<release-version>44</release-version>
+	</preferences>
+
+	<!-- Fedora repositories -->
+	<repository type="rpm-md" alias="fedora" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+		</source>
+	</repository>
+	<repository type="rpm-md" alias="updates" sourcetype="metalink">
+		<source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&amp;arch=$basearch">
+			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
+		</source>
+	</repository>
+
+	<!-- Bootstrap packages -->
+	<packages type="bootstrap">
+		<package name="filesystem"/>
+	</packages>
+
+	<!-- Core packages shared by all images -->
+	<packages type="image">
+		<package name="coreutils"/>
+		<package name="bash"/>
+		<package name="glibc"/>
+		<package name="util-linux"/>
+		<package name="systemd"/>
+		<package name="systemd-udev"/>
+		<package name="NetworkManager"/>
+		<package name="iproute"/>
+		<package name="iputils"/>
+		<package name="less"/>
+		<package name="procps-ng"/>
+		<package name="findutils"/>
+		<package name="grep"/>
+		<package name="sed"/>
+		<package name="gawk"/>
+	</packages>
+
+	<!-- Root user (password gets cleared in config.sh) -->
+	<users>
+		<user name="root" groups="root" password="linux" home="/root" pwdformat="plain"/>
+	</users>
+</image>

@@ -7,6 +7,11 @@ device (e.g. `/dev/nvme0n1`) and exposes it over the network via `nbd-server`.
 A remote build host can then connect with `nbd-client` and write a raw disk
 image straight onto the laptop drive.
 
+## Shared Configuration
+
+Common preferences (timezone, locale, repos, core packages) are defined in
+`../common.xml` and included by both this image and the Workstation image.
+
 ## Workflow
 
 ```
@@ -31,6 +36,11 @@ sudo kiwi-ng --type iso system build \
     --target-dir ./outdir
 ```
 
+Or use the build script:
+```bash
+sudo ./build.sh nbd
+```
+
 ## Usage
 
 1. Flash the resulting ISO to a USB stick.
@@ -41,7 +51,7 @@ sudo kiwi-ng --type iso system build \
    ```bash
    modprobe nbd
    nbd-client <laptop-ip> 10809 /dev/nbd0
-   dd if=base-oem-uki.raw of=/dev/nbd0 bs=4M status=progress
+   dd if=ALACS-Workstation.x86_64-1.0.0.raw of=/dev/nbd0 bs=4M status=progress
    nbd-client -d /dev/nbd0
    ```
 6. Press OK in the dialog to stop the server, then power off.

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ALACS Fedora Workstation — Raw Disk Image
+
+  A basic Fedora Workstation with:
+  - GRUB2 bootloader (EFI)
+  - GNOME desktop environment
+  - Two partitions: EFI (FAT32) + root (ext4)
+
+  Build with:
+    kiwi-ng type=oem system build description=./workstation target-dir=./outdir
+-->
+
+<image schemaversion="7.4" name="ALACS-Workstation">
+	<description type="system">
+		<author>ALACS</author>
+		<contact>alacs@localhost</contact>
+		<specification>Fedora Workstation raw disk image</specification>
+	</description>
+
+	<!-- Pull in shared preferences, repos, core packages, users -->
+	<include from="this://../common.xml"/>
+
+	<!-- Image type: raw OEM disk with grub2, EFI + ext4 root -->
+	<preferences arch="x86_64">
+		<type image="oem"
+		      primary="true"
+		      filesystem="ext4"
+		      firmware="efi"
+		      efipartsize="512"
+		      kernelcmdline="rhgb quiet"
+		      format="raw">
+			<bootloader name="grub2" timeout="5"/>
+			<oemconfig>
+				<oem-resize>true</oem-resize>
+			</oemconfig>
+			<size unit="G">20</size>
+		</type>
+	</preferences>
+
+	<!-- Workstation image packages -->
+	<packages type="image">
+		<!-- Fedora release -->
+		<package name="fedora-release-workstation"/>
+
+		<!-- Kernel -->
+		<package name="kernel-core"/>
+		<package name="kernel-modules"/>
+
+		<!-- Bootloader -->
+		<package name="grub2-efi-x64"/>
+		<package name="grub2-efi-x64-modules"/>
+		<package name="shim-signed-x64"/>
+
+		<!-- systemd extras -->
+		<package name="systemd-resolved"/>
+		<package name="systemd-oomd-defaults"/>
+
+		<!-- GNOME Desktop -->
+		<namedCollection name="workstation-product-environment"/>
+		<namedCollection name="fonts"/>
+		<namedCollection name="multimedia"/>
+		<namedCollection name="networkmanager-submodules"/>
+		<namedCollection name="printing"/>
+		<namedCollection name="guest-desktop-agents"/>
+		<package name="mediawriter"/>
+
+		<!-- Firmware -->
+		<package name="linux-firmware"/>
+
+		<!-- Filesystem tools -->
+		<package name="e2fsprogs"/>
+		<package name="dosfstools"/>
+
+		<!-- Locale support -->
+		<package name="glibc-all-langpacks"/>
+
+		<!-- Basic utilities -->
+		<package name="vim-minimal"/>
+		<package name="sudo"/>
+	</packages>
+</image>

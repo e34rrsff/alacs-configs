@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  NBD Block Device Exposer — Live ISO
+  ALACS NBD Exposer — Live ISO
 
   Boots to a dialog that lets the operator pick a local block device
   (e.g. /dev/nvme0n1) and exposes it over the network via nbd-server.
   A remote build host can then connect with nbd-client and write a
   raw disk image straight onto the laptop drive.
 
-  Build:
-    kiwi-ng --type iso system build \
-        --description ./nbd-exposer \
-        --target-dir ./outdir
+  Build with:
+    kiwi-ng type=iso system build description=./nbd-exposer target-dir=./outdir
 -->
 
 <image schemaversion="7.4" name="ALACS-NBD-Exposer">
@@ -21,19 +19,10 @@
 		<specification>Live ISO that exposes a local block device over NBD</specification>
 	</description>
 
-	<preferences>
-		<version>1.0.0</version>
-		<packagemanager>dnf5</packagemanager>
-		<locale>en_US</locale>
-		<keytable>us</keytable>
-		<timezone>Los_Angeles</timezone>
-		<rpm-excludedocs>true</rpm-excludedocs>
-		<release-version>44</release-version>
-	</preferences>
+	<!-- Pull in shared preferences, repos, core packages, users -->
+	<include from="this://../common.xml"/>
 
-	<!-- ============================================================ -->
-	<!--  ISO type: UEFI-only hybrid live image using dmsquash        -->
-	<!-- ============================================================ -->
+	<!-- ISO type: UEFI-only hybrid live image using dmsquash -->
 	<preferences arch="x86_64">
 		<type image="iso"
 		      primary="true"
@@ -46,38 +35,14 @@
 		      mediacheck="false"
 		      publisher="ALACS"
 		      volid="ALACS_NBD_EXPOSER"
-		      application_id="ALACS_NBD_EXPOSER"
-		      >
+		      application_id="ALACS_NBD_EXPOSER">
 			<bootloader name="grub2" console="console" timeout="5"/>
 		</type>
 	</preferences>
 
-	<!-- ============================================================ -->
-	<!--  Repositories — Fedora stable (change $releasever as needed) -->
-	<!-- ============================================================ -->
-	<repository type="rpm-md" alias="fedora" sourcetype="metalink">
-		<source path="https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&amp;arch=$basearch">
-			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
-		</source>
-	</repository>
-	<repository type="rpm-md" alias="updates" sourcetype="metalink">
-		<source path="https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&amp;arch=$basearch">
-			<signing key="file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-$releasever-primary"/>
-		</source>
-	</repository>
-
-	<!-- ============================================================ -->
-	<!--  Bootstrap: bare minimum to get dnf going                    -->
-	<!-- ============================================================ -->
-	<packages type="bootstrap">
-		<package name="filesystem"/>
-	</packages>
-
-	<!-- ============================================================ -->
-	<!--  Image packages: everything that goes into the live root     -->
-	<!-- ============================================================ -->
+	<!-- NBD Exposer image packages -->
 	<packages type="image">
-		<!-- Fedora release files -->
+		<!-- Fedora release -->
 		<package name="fedora-release"/>
 
 		<!-- Kernel + initramfs infrastructure -->
@@ -86,20 +51,6 @@
 		<package name="dracut"/>
 		<package name="dracut-live"/>
 
-		<!-- Core system -->
-		<package name="systemd"/>
-		<package name="systemd-pam"/>
-		<package name="bash"/>
-		<package name="coreutils"/>
-		<package name="util-linux"/>
-		<package name="glibc"/>
-
-		<!-- Networking -->
-		<package name="NetworkManager"/>
-		<package name="iproute"/>
-		<package name="iputils"/>
-		<package name="dhclient"/>
-
 		<!-- NBD server -->
 		<package name="nbd"/>
 
@@ -107,36 +58,21 @@
 		<package name="dialog"/>
 
 		<!-- Block device tools -->
-		<package name="lsblk"/>
 		<package name="hdparm"/>
 		<package name="nvme-cli"/>
 
+		<!-- Networking extras -->
+		<package name="dhclient"/>
+
 		<!-- Firmware for common laptop NICs / NVMe -->
 		<package name="linux-firmware"/>
-
-		<!-- Misc useful -->
-		<package name="less"/>
-		<package name="procps-ng"/>
-		<package name="findutils"/>
-		<package name="grep"/>
-		<package name="sed"/>
-		<package name="gawk"/>
 	</packages>
 
-	<!-- ============================================================ -->
-	<!--  ISO-specific packages (cdboot EFI grub modules)             -->
-	<!-- ============================================================ -->
+	<!-- ISO-specific packages (EFI grub modules for the live boot) -->
 	<packages type="iso">
 		<package name="grub2-efi-x64" arch="x86_64"/>
 		<package name="grub2-efi-x64-modules" arch="x86_64"/>
 		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
 		<package name="shim-signed-x64" arch="x86_64"/>
 	</packages>
-
-	<!-- ============================================================ -->
-	<!--  Root user (password gets cleared in config.sh)              -->
-	<!-- ============================================================ -->
-	<users>
-		<user name="root" groups="root" password="linux" home="/root" pwdformat="plain"/>
-	</users>
 </image>
