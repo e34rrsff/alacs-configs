@@ -7,6 +7,7 @@
 		<keytable>us</keytable>
 		<timezone>America/Los_Angeles</timezone>
 		<rpm-excludedocs>true</rpm-excludedocs>
+		<!-- Specifies which release of Fedora to build!!! -->
 		<release-version>44</release-version>
 	</preferences>
 
@@ -33,6 +34,7 @@
 		<package name="bash"/>
 		<package name="glibc"/>
 		<package name="util-linux"/>
+		<package name="mesa-dri-drivers"/>
 		<package name="systemd"/>
 		<package name="systemd-udev"/>
 		<package name="NetworkManager"/>
@@ -48,6 +50,6 @@
 
 	<!-- Root user (password gets cleared in config.sh) -->
 	<users>
-		<user name="root" groups="root" password="linux" home="/root" pwdformat="plain"/>
+		<user name="root" groups="root" password="root" home="/root" pwdformat="plain"/>
 	</users>
 </image>

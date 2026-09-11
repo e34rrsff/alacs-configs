@@ -1,18 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--
-  ALACS Fedora Workstation — Raw Disk Image
-
-  A basic Fedora Workstation with:
-  - GRUB2 bootloader (EFI)
-  - GNOME desktop environment
-  - Two partitions: EFI (FAT32) + root (ext4)
-
-  Build with:
-    kiwi-ng type=oem system build description=./workstation target-dir=./outdir
--->
-
-<image schemaversion="7.4" name="ALACS-Workstation">
+<image schemaversion="7.4" name="alacs-fedora-workstation">
 	<description type="system">
 		<author>ALACS</author>
 		<contact>alacs@localhost</contact>
@@ -29,17 +16,19 @@
 		      filesystem="ext4"
 		      firmware="efi"
 		      efipartsize="512"
-		      kernelcmdline="rhgb quiet"
-			<bootloader name="grub2" timeout="5"/>
-			<oemconfig>
-				<oem-resize>true</oem-resize>
-			</oemconfig>
-			<size unit="G">20</size>
+		      kernelcmdline="rhgb quiet">
+		      	<bootloader name="grub2" timeout="5" bls="true"/>
+        		<oemconfig>
+        			<oem-resize>true</oem-resize>
+        		</oemconfig>
+        		<size unit="G">8</size>
 		</type>
 	</preferences>
 
 	<!-- Workstation image packages -->
 	<packages type="image">
+		<namedCollection name="standard"/>
+
 		<!-- Fedora release -->
 		<package name="fedora-release-workstation"/>
 
@@ -50,10 +39,15 @@
 		<!-- Bootloader -->
 		<package name="grub2-efi-x64" arch="x86_64"/>
 		<package name="grub2-efi-x64-modules" arch="x86_64"/>
+		<package name="grub2-pc" arch="x86_64"/>
+		<package name="grub2-pc-modules" arch="x86_64"/>
 		<package name="shim-signed-x64"/>
 
+		<!-- Initrd -->
+		<package name="dracut-kiwi-oem-repart"/>
+		<package name="dracut-kiwi-oem-dump"/>
+
 		<!-- systemd extras -->
-		<package name="systemd-resolved"/>
 		<package name="systemd-oomd-defaults"/>
 
 		<!-- GNOME Desktop -->
@@ -62,7 +56,6 @@
 		<namedCollection name="multimedia"/>
 		<namedCollection name="networkmanager-submodules"/>
 		<namedCollection name="printing"/>
-		<namedCollection name="guest-desktop-agents"/>
 		<package name="mediawriter"/>
 
 		<!-- Firmware -->

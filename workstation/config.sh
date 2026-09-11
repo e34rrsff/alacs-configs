@@ -11,6 +11,9 @@ echo "==> Configuring ALACS Workstation image..."
 rm -f /etc/machine-id
 echo 'uninitialized' > /etc/machine-id
 
+# ── Hostname: set the system's hostname ────────────────────────────
+echo "alacs-workstation" > /etc/hostname
+
 # ── Clear root password and lock the account ───────────────────────
 passwd -d root
 passwd -l root
